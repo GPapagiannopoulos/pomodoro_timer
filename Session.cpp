@@ -1,4 +1,5 @@
 #include "Session.h"
+#include <iostream>
 
 Session::Session(std::chrono::minutes duration_, std::string_view label_)
 	: duration{ duration_ }, label{ label_ } {
@@ -7,6 +8,16 @@ Session::Session(std::chrono::minutes duration_, std::string_view label_)
 
 std::chrono::minutes Session::getDuration() const {
 	return duration;
+}
+
+std::tuple<int, int, int> Session::getRemainingTime() const {
+	const std::chrono::duration time_passed = getDuration() - (std::chrono::system_clock::now() - startedAt);
+	std::cout << time_passed << "\n";
+	int remaining_hours = std::chrono::duration_cast<std::chrono::hours>(time_passed).count();
+	int remaining_minutes = std::chrono::duration_cast<std::chrono::minutes>(time_passed).count() % 60;
+	int remaining_seconds = std::chrono::duration_cast<std::chrono::seconds>(time_passed).count() % 60; 
+
+	return std::make_tuple(remaining_hours, remaining_minutes, remaining_seconds);
 }
 const std::string Session::getLabel() const {
 	return label;
