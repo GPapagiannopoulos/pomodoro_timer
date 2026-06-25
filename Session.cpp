@@ -12,7 +12,6 @@ std::chrono::minutes Session::getDuration() const {
 
 std::tuple<int, int, int> Session::getRemainingTime() const {
 	const std::chrono::duration time_passed = getDuration() - (std::chrono::system_clock::now() - startedAt);
-	std::cout << time_passed << "\n";
 	int remaining_hours = std::chrono::duration_cast<std::chrono::hours>(time_passed).count();
 	int remaining_minutes = std::chrono::duration_cast<std::chrono::minutes>(time_passed).count() % 60;
 	int remaining_seconds = std::chrono::duration_cast<std::chrono::seconds>(time_passed).count() % 60; 
