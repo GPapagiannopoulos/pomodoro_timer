@@ -15,5 +15,6 @@ public:
 
 	std::chrono::minutes getDuration() const;
 	std::tuple<int, int, int> getRemainingTime() const;
+	bool isTimerComplete() const;
 	const std::string getLabel() const;
 };

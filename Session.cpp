@@ -21,3 +21,7 @@ std::tuple<int, int, int> Session::getRemainingTime() const {
 const std::string Session::getLabel() const {
 	return label;
 }
+bool Session::isTimerComplete() const {
+	auto [h, m, s] = getRemainingTime();
+	return h == 0 && m == 0 && s == 0;
+}

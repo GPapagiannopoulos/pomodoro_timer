@@ -61,8 +61,10 @@ int main() {
 		else {
 			auto [h, m, s] = active_session->getRemainingTime();
 			ImGui::Text("Remaining: %d:%02d:%02d", h, m, s);
-			if (ImGui::Button("Stop")) {
+			if (active_session->isTimerComplete() || ImGui::Button("Stop")) {
 				active_session = nullptr;
+				duration = 0;
+				label[0] = '\0';
 			}
 		}
 		ImGui::End();
