@@ -24,13 +24,12 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Test", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Pomodoro Timer", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	
 	ImGui::CreateContext();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
-
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -39,8 +38,15 @@ int main() {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		
+		int w, h;
+		bool p_open = true;
+		glfwGetWindowSize(window, &w, &h);
+		ImGui::SetNextWindowSize(ImVec2(w, h), ImGuiCond_Always);
+		ImGui::GetStyle().WindowPadding = ImVec2(0, 0);
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::Begin("Timer", &p_open,ImGuiWindowFlags_NoTitleBar);
 
-		ImGui::Begin("Timer");
 		if (active_session == nullptr) {
 			ImGui::InputInt("Duration (min)", &duration);
 			ImGui::InputText("Label", label, LABEL_BUFFER_SIZE);
