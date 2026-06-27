@@ -30,6 +30,8 @@ int main() {
 	ImGui::CreateContext();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+	ImGuiIO& io = ImGui::GetIO();
+	io.FontGlobalScale = 2.0f;
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -45,7 +47,7 @@ int main() {
 		ImGui::SetNextWindowSize(ImVec2(w, h), ImGuiCond_Always);
 		ImGui::GetStyle().WindowPadding = ImVec2(0, 0);
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::Begin("Timer", &p_open,ImGuiWindowFlags_NoTitleBar);
+		ImGui::Begin("Timer", &p_open,ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
 		if (active_session == nullptr) {
 			ImGui::InputInt("Duration (min)", &duration);
