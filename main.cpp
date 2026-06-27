@@ -1,5 +1,7 @@
 #include <iostream>
 #include <thread>
+#include <memory>
+#include <string_view>
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -7,8 +9,13 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+const int LABEL_BUFFER_SIZE = 64;
+
 int main() {
-	
+	char label[LABEL_BUFFER_SIZE] = "";
+	std::unique_ptr<Session> active_session = nullptr; 
+	int duration = 0;
+
 	if (!glfwInit()) {
 		std::cout << "Initialization failed.\n";
 		return 1;
@@ -26,10 +33,6 @@ int main() {
 
 
 	while (!glfwWindowShouldClose(window)) {
-		int duration = 0;
-		int bufSize = 64;
-		char buf[] = "";
-		int h = 1, m = 24, s = 39;
 
 		glfwPollEvents();
 
@@ -38,10 +41,22 @@ int main() {
 		ImGui::NewFrame();
 
 		ImGui::Begin("Timer");
-		ImGui::InputInt("Duration (min)", &duration);
-		ImGui::InputText("Label", buf, bufSize);
-		ImGui::Button("Start");
-		ImGui::Text("Remaining: %d:%02d:%02d", h, m, s);
+		if (active_session == nullptr) {
+			ImGui::InputInt("Duration (min)", &duration);
+			ImGui::InputText("Label", label, LABEL_BUFFER_SIZE);
+			if (ImGui::Button("Start")) {
+				active_session = std::make_unique<Session>(
+					Session(
+						std::chrono::minutes(duration), std::string_view(label)));
+			}
+		}
+		else {
+			auto [h, m, s] = active_session->getRemainingTime();
+			ImGui::Text("Remaining: %d:%02d:%02d", h, m, s);
+			if (ImGui::Button("Stop")) {
+				active_session = nullptr;
+			}
+		}
 		ImGui::End();
 
 		ImGui::Render();
