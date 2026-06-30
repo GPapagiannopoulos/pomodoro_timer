@@ -57,6 +57,24 @@ int main() {
 		if (active_session == nullptr) {
 			ImGui::InputInt("Duration (min)", &duration);
 			ImGui::InputText("Label", label, LABEL_BUFFER_SIZE);
+
+			int currentDevice = player.getSelectedDeviceIndex();
+			const char* preview_text = currentDevice == -1 ? "Select a device..." : player.getDeviceInfo(currentDevice).name;
+				
+			if (ImGui::BeginCombo("Playback Devices", preview_text)) {
+				ma_uint32 availableDeviceCount = player.getDeviceCount();
+
+				for (int i = 0; i < availableDeviceCount; i++) {
+					if (ImGui::Selectable(player.getDeviceInfo(i).name)) {
+						player.updateSelectedDevice(i);
+					};
+					if (i == currentDevice) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+			
 			if (ImGui::Button("Start")) {
 				active_session = std::make_unique<Session>(
 					Session(
