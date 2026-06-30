@@ -27,6 +27,9 @@ AudioPlayer::~AudioPlayer() {
 	if (deviceInitialized) {
 		ma_device_uninit(&device);
 	}
+	if (decoderInitialized) {
+		ma_decoder_uninit(&decoder);
+	}
 }
 
 void AudioPlayer::enumerateAvailablePlaybackDevices() {
@@ -61,19 +64,29 @@ void AudioPlayer::updateSelectedDevice(int deviceIndex) {
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+	ma_decoder* decoder = static_cast<ma_decoder*>(pDevice->pUserData);
 
+	ma_uint64 frames_read = 0;
+	ma_decoder_read_pcm_frames(decoder, pOutput, frameCount, &frames_read);
+
+	if (frames_read < frameCount) {
+		ma_decoder_seek_to_pcm_frame(decoder, 0);
+	}
 }
+
 void AudioPlayer::startAudioDevice() {
 	ma_result decoder_init_result = ma_decoder_init_file("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/smooth_brown_noise.mp3", NULL, &decoder);
 	if (decoder_init_result != MA_SUCCESS) {
 		throw std::runtime_error(
 			std::format("Failed to initialize decoder. Error code: {}", static_cast<int>(decoder_init_result)));
 	}
+	decoderInitialized = true;
 
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
-	config.playback.format = ma_format_unknown;
-	config.playback.channels = 0;
-	config.sampleRate = 0;
+	config.playback.pDeviceID = &pAvailablePlaybackDevices[selectedDeviceIndex].id;
+	config.playback.format = decoder.outputFormat;
+	config.playback.channels = decoder.outputChannels;
+	config.sampleRate = decoder.outputSampleRate;
 	config.dataCallback = data_callback;
 	config.pUserData = &decoder;
 	

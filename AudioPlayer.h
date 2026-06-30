@@ -4,6 +4,8 @@
 class AudioPlayer {
 private:
 	bool deviceInitialized = false;
+	bool decoderInitialized = false;
+
 	ma_device device;
 	ma_decoder decoder;
 	ma_context context;
