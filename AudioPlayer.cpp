@@ -65,17 +65,24 @@ void AudioPlayer::updateSelectedDevice(int deviceIndex) {
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 	ma_decoder* decoder = static_cast<ma_decoder*>(pDevice->pUserData);
+	ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels);
+	ma_uint64 framesWritten = 0;
+	uint8_t* pOutputOffset = static_cast<uint8_t*>(pOutput);
 
-	ma_uint64 frames_read = 0;
-	ma_decoder_read_pcm_frames(decoder, pOutput, frameCount, &frames_read);
+	while (framesWritten < frameCount) {
+		ma_uint64 framesWrittenThisIteration = 0;
+		ma_decoder_read_pcm_frames(decoder, pOutputOffset, frameCount - framesWritten, &framesWrittenThisIteration);
+		framesWritten += framesWrittenThisIteration;
+		pOutputOffset += framesWritten * bytesPerFrame;
 
-	if (frames_read < frameCount) {
-		ma_decoder_seek_to_pcm_frame(decoder, 0);
+		if (framesWritten < frameCount) {
+			ma_decoder_seek_to_pcm_frame(decoder, 0);
+		}
 	}
 }
 
 void AudioPlayer::startAudioDevice() {
-	ma_result decoder_init_result = ma_decoder_init_file("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/smooth_brown_noise.mp3", NULL, &decoder);
+	ma_result decoder_init_result = ma_decoder_init_file("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/brown_noise_short.mp3", NULL, &decoder);
 	if (decoder_init_result != MA_SUCCESS) {
 		throw std::runtime_error(
 			std::format("Failed to initialize decoder. Error code: {}", static_cast<int>(decoder_init_result)));
