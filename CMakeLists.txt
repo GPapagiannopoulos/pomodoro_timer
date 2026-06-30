@@ -12,7 +12,13 @@ FetchContent_Declare(
 	GIT_REPOSITORY https://github.com/ocornut/imgui
 	GIT_TAG 8936b58fe26e8c3da834b8f60b06511d537b4c63
 )
-FetchContent_MakeAvailable(glfw imgui)
+FetchContent_Declare(
+	miniaudio
+	GIT_REPOSITORY https://github.com/mackron/miniaudio
+	GIT_TAG 4a5b74bef029b3592c54b6048650ee5f972c1a48
+)
+
+FetchContent_MakeAvailable(glfw imgui miniaudio)
 
 find_package(OpenGL REQUIRED)
 set(CMAKE_CXX_STANDARD 20)
@@ -28,12 +34,13 @@ add_executable(pomodoro
 	"${imgui_SOURCE_DIR}/imgui_widgets.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-)
+ "AudioPlayer.h" "AudioPlayer.cpp")
 
 target_include_directories(
 	pomodoro PRIVATE
 	"${imgui_SOURCE_DIR}"
 	"${imgui_SOURCE_DIR}/backends"
+	"${miniaudio_SOURCE_DIR}"
 )
 target_link_libraries(
 	pomodoro PRIVATE

@@ -2,12 +2,15 @@
 #include <thread>
 #include <memory>
 #include <string_view>
+#include <stdexcept>
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "Session.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
+#include "AudioPlayer.h"
 
 const int LABEL_BUFFER_SIZE = 64;
 
@@ -16,9 +19,11 @@ int main() {
 	std::unique_ptr<Session> active_session = nullptr; 
 	int duration = 0;
 
+	AudioPlayer player = AudioPlayer();
+
 	if (!glfwInit()) {
-		std::cout << "Initialization failed.\n";
-		return 1;
+		throw new std::runtime_error("Failed to initialize GLFW.");
+		return -1;
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
