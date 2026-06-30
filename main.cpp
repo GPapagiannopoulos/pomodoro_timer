@@ -79,6 +79,7 @@ int main() {
 				active_session = std::make_unique<Session>(
 					Session(
 						std::chrono::minutes(duration), std::string_view(label)));
+				player.startAudioDevice();
 			}
 		}
 		else {

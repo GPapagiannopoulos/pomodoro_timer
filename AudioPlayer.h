@@ -3,8 +3,9 @@
 
 class AudioPlayer {
 private:
+	bool deviceInitialized = false;
 	ma_device device;
-	ma_device_config config;
+	ma_decoder decoder;
 	ma_context context;
 	ma_device_info* pAvailablePlaybackDevices = nullptr;
 	ma_uint32 playbackDeviceCount = 0;
@@ -24,4 +25,6 @@ public:
 	ma_uint32 getDeviceCount() const;
 	int getSelectedDeviceIndex() const;
 	void updateSelectedDevice(int deviceIndex);
+
+	void startAudioDevice();
 };

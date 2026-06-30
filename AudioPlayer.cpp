@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <format>
+#include <filesystem>
 
 const unsigned int BUFFER_SIZE = 64;
 
@@ -22,6 +23,9 @@ AudioPlayer::~AudioPlayer() {
 
 	if (pAvailablePlaybackDevices) {
 		delete[] pAvailablePlaybackDevices;
+	}
+	if (deviceInitialized) {
+		ma_device_uninit(&device);
 	}
 }
 
@@ -54,4 +58,31 @@ int AudioPlayer::getSelectedDeviceIndex() const {
 }
 void AudioPlayer::updateSelectedDevice(int deviceIndex) {
 	selectedDeviceIndex = deviceIndex;
+}
+
+void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+
+}
+void AudioPlayer::startAudioDevice() {
+	ma_result decoder_init_result = ma_decoder_init_file("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/smooth_brown_noise.mp3", NULL, &decoder);
+	if (decoder_init_result != MA_SUCCESS) {
+		throw std::runtime_error(
+			std::format("Failed to initialize decoder. Error code: {}", static_cast<int>(decoder_init_result)));
+	}
+
+	ma_device_config config = ma_device_config_init(ma_device_type_playback);
+	config.playback.format = ma_format_unknown;
+	config.playback.channels = 0;
+	config.sampleRate = 0;
+	config.dataCallback = data_callback;
+	config.pUserData = &decoder;
+	
+	ma_result result = ma_device_init(NULL, &config, &device);
+	if (result != MA_SUCCESS) {
+		throw std::runtime_error(
+			std::format("Failed to initialize device. Error code: {}", static_cast<int>(result)));
+	}
+	deviceInitialized = true;
+
+	ma_device_start(&device);
 }
