@@ -89,6 +89,7 @@ int main() {
 				active_session = nullptr;
 				duration = 0;
 				label[0] = '\0';
+				player.stopAudioDevice();
 			}
 		}
 		ImGui::End();

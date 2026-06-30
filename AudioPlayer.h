@@ -29,4 +29,5 @@ public:
 	void updateSelectedDevice(int deviceIndex);
 
 	void startAudioDevice();
+	void stopAudioDevice();
 };

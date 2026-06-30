@@ -99,3 +99,7 @@ void AudioPlayer::startAudioDevice() {
 
 	ma_device_start(&device);
 }
+
+void AudioPlayer::stopAudioDevice() {
+	ma_device_stop(&device);
+}
