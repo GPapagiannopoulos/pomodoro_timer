@@ -62,9 +62,15 @@ int AudioPlayer::getSelectedDeviceIndex() const {
 void AudioPlayer::updateSelectedDevice(int deviceIndex) {
 	selectedDeviceIndex = deviceIndex;
 }
-
+ma_decoder* AudioPlayer::getDecoder()  {
+	return &decoder;
+}
+bool AudioPlayer::getLoopSound() const {
+	return loopSound;
+}
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
-	ma_decoder* decoder = static_cast<ma_decoder*>(pDevice->pUserData);
+	AudioPlayer* player = static_cast<AudioPlayer*>(pDevice->pUserData);
+	ma_decoder* decoder = player->getDecoder();
 	ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels);
 	ma_uint64 framesWritten = 0;
 	uint8_t* pOutputOffset = static_cast<uint8_t*>(pOutput);
@@ -76,33 +82,40 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 		pOutputOffset += framesWritten * bytesPerFrame;
 
 		if (framesWritten < frameCount) {
+			if (!player->getLoopSound()) return;
 			ma_decoder_seek_to_pcm_frame(decoder, 0);
 		}
 	}
 }
 
-void AudioPlayer::startAudioDevice() {
-	ma_result decoder_init_result = ma_decoder_init_file("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/brown_noise_short.mp3", NULL, &decoder);
+void AudioPlayer::initializeDecoder(std::string file_path) {
+	ma_result decoder_init_result = ma_decoder_init_file(file_path.c_str(), NULL, &decoder);
 	if (decoder_init_result != MA_SUCCESS) {
 		throw std::runtime_error(
 			std::format("Failed to initialize decoder. Error code: {}", static_cast<int>(decoder_init_result)));
 	}
 	decoderInitialized = true;
-
+}
+void AudioPlayer::initializePlaybackDevice() {
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = &pAvailablePlaybackDevices[selectedDeviceIndex].id;
 	config.playback.format = decoder.outputFormat;
 	config.playback.channels = decoder.outputChannels;
 	config.sampleRate = decoder.outputSampleRate;
 	config.dataCallback = data_callback;
-	config.pUserData = &decoder;
-	
+	config.pUserData = this;
+
 	ma_result result = ma_device_init(NULL, &config, &device);
 	if (result != MA_SUCCESS) {
 		throw std::runtime_error(
 			std::format("Failed to initialize device. Error code: {}", static_cast<int>(result)));
 	}
 	deviceInitialized = true;
+}
+
+void AudioPlayer::startAudioDevice() {
+	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/alerts/alert.mp3");
+	initializePlaybackDevice();
 
 	ma_device_start(&device);
 }

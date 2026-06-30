@@ -1,10 +1,12 @@
 #pragma once 
 #include "miniaudio.h"
+#include <string>
 
 class AudioPlayer {
 private:
 	bool deviceInitialized = false;
 	bool decoderInitialized = false;
+	bool loopSound = false;
 
 	ma_device device;
 	ma_decoder decoder;
@@ -14,6 +16,10 @@ private:
 	int selectedDeviceIndex = -1;
 
 	void enumerateAvailablePlaybackDevices();
+	void initializeDecoder(std::string file_path);
+	void initializePlaybackDevice();
+	void playAlertSound();
+
 public:
 	AudioPlayer();
 	~AudioPlayer();
@@ -26,6 +32,8 @@ public:
 	ma_device_info getDeviceInfo(int deviceIndex);
 	ma_uint32 getDeviceCount() const;
 	int getSelectedDeviceIndex() const;
+	ma_decoder* getDecoder();
+	bool getLoopSound() const;
 	void updateSelectedDevice(int deviceIndex);
 
 	void startAudioDevice();
