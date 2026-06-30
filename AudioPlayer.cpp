@@ -19,16 +19,16 @@ AudioPlayer::AudioPlayer() {
 }
 
 AudioPlayer::~AudioPlayer() {
-	ma_context_uninit(&context);
-
-	if (pAvailablePlaybackDevices) {
-		delete[] pAvailablePlaybackDevices;
-	}
 	if (deviceInitialized) {
 		ma_device_uninit(&device);
 	}
 	if (decoderInitialized) {
 		ma_decoder_uninit(&decoder);
+	}
+	ma_context_uninit(&context);
+
+	if (pAvailablePlaybackDevices) {
+		delete[] pAvailablePlaybackDevices;
 	}
 }
 
@@ -68,6 +68,26 @@ ma_decoder* AudioPlayer::getDecoder()  {
 bool AudioPlayer::getLoopSound() const {
 	return loopSound;
 }
+void AudioPlayer::updateLoopSound() {
+	loopSound = !loopSound;
+}
+bool AudioPlayer::getAlertStatus() const {
+	return alertPlayed;
+}
+void AudioPlayer::updateAlertStatus() {
+	mutex.lock();
+	alertPlayed = !alertPlayed;
+	mutex.unlock();
+	c_var.notify_one();
+}
+void AudioPlayer::uninitDevice() {
+	ma_device_uninit(&device);
+	deviceInitialized = false;
+}
+void AudioPlayer::uninitDecoder() {
+	ma_decoder_uninit(&decoder);
+	decoderInitialized = false;
+}
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 	AudioPlayer* player = static_cast<AudioPlayer*>(pDevice->pUserData);
 	ma_decoder* decoder = player->getDecoder();
@@ -79,10 +99,13 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 		ma_uint64 framesWrittenThisIteration = 0;
 		ma_decoder_read_pcm_frames(decoder, pOutputOffset, frameCount - framesWritten, &framesWrittenThisIteration);
 		framesWritten += framesWrittenThisIteration;
-		pOutputOffset += framesWritten * bytesPerFrame;
+		pOutputOffset += framesWrittenThisIteration * bytesPerFrame;
 
 		if (framesWritten < frameCount) {
-			if (!player->getLoopSound()) return;
+			if (!player->getLoopSound()) {
+				player->updateAlertStatus();
+				return;
+			}
 			ma_decoder_seek_to_pcm_frame(decoder, 0);
 		}
 	}
@@ -113,13 +136,33 @@ void AudioPlayer::initializePlaybackDevice() {
 	deviceInitialized = true;
 }
 
-void AudioPlayer::startAudioDevice() {
+void AudioPlayer::playAlert() {
+	if (getAlertStatus()) {
+		updateAlertStatus();
+	}
 	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/alerts/alert.mp3");
 	initializePlaybackDevice();
+	ma_device_start(&device);
+	std::unique_lock<std::mutex> lock (mutex);
+	c_var.wait(lock, [this] { return getAlertStatus(); });
 
+	ma_device_stop(&device);
+	uninitDevice();
+	uninitDecoder();
+}
+
+void AudioPlayer::playAmbientNoise() {
+	updateLoopSound();
+	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/smooth_brown_noise.mp3");
+	initializePlaybackDevice();
 	ma_device_start(&device);
 }
 
 void AudioPlayer::stopAudioDevice() {
 	ma_device_stop(&device);
+	uninitDevice();
+	uninitDecoder();
+	
+	updateLoopSound();
+	playAlert();
 }

@@ -1,12 +1,17 @@
 #pragma once 
 #include "miniaudio.h"
 #include <string>
+#include <mutex>
+#include <condition_variable>
 
 class AudioPlayer {
 private:
 	bool deviceInitialized = false;
 	bool decoderInitialized = false;
 	bool loopSound = false;
+	bool alertPlayed = false;
+	std::mutex mutex; 
+	std::condition_variable c_var;
 
 	ma_device device;
 	ma_decoder decoder;
@@ -18,7 +23,6 @@ private:
 	void enumerateAvailablePlaybackDevices();
 	void initializeDecoder(std::string file_path);
 	void initializePlaybackDevice();
-	void playAlertSound();
 
 public:
 	AudioPlayer();
@@ -34,8 +38,14 @@ public:
 	int getSelectedDeviceIndex() const;
 	ma_decoder* getDecoder();
 	bool getLoopSound() const;
+	void updateLoopSound();
+	bool getAlertStatus() const;
+	void updateAlertStatus();
 	void updateSelectedDevice(int deviceIndex);
 
-	void startAudioDevice();
+	void uninitDevice();
+	void uninitDecoder();
+	void playAlert();
+	void playAmbientNoise();
 	void stopAudioDevice();
 };
