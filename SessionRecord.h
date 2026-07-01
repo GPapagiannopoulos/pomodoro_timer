@@ -1,6 +1,7 @@
 #pragma once 
 #include <chrono>
 #include <string>
+#include <optional>
 #include "Session.h"
 
 class SessionRecord {

@@ -7,14 +7,16 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "Session.h"
+#include "SessionStore.h"
+#include "AudioPlayer.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "AudioPlayer.h"
 
 const int LABEL_BUFFER_SIZE = 64;
 
 int main() {
+	SessionStore store{ "pomodoro.db" };
 	char label[LABEL_BUFFER_SIZE] = "";
 	std::unique_ptr<Session> active_session = nullptr; 
 	int duration = 0;
