@@ -11,7 +11,7 @@ SessionStore::SessionStore(const std::string& filename) {
 			std::format("Opening of database file failed. Error: {}", result));
 	}
 	char* errorMsg = nullptr;
-	sqlite3_exec(dbHandle, "CREATE TABLE IF NOT EXISTS sessions;", NULL, NULL, &errorMsg);
+	sqlite3_exec(dbHandle, "CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, label TEXT NOT NULL, intended_duration INTEGER NOT NULL, started_at INTEGER NOT NULL, ended_at INTEGER, is_completed INTEGER NOT NULL DEFAULT 0);", NULL, NULL, &errorMsg);
 	if (errorMsg) {
 		std::string errorMsgStr(errorMsg);
 		sqlite3_free(errorMsg);
