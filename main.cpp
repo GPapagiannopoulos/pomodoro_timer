@@ -9,6 +9,7 @@
 #include "Session.h"
 #include "SessionStore.h"
 #include "AudioPlayer.h"
+#include "Paths.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -16,7 +17,7 @@
 const int LABEL_BUFFER_SIZE = 64;
 
 int main() {
-	SessionStore store{ "pomodoro.db" };
+	SessionStore store{ (Paths::userDataDir("pomodoro_timer") / "pomodoro.db").string() };
 	char label[LABEL_BUFFER_SIZE] = "";
 	std::unique_ptr<Session> active_session = nullptr; 
 	int duration = 0;

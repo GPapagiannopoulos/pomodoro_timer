@@ -48,3 +48,9 @@ target_link_libraries(
 	glfw
 	OpenGL::GL
 )
+
+add_custom_command(TARGET pomodoro POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+		"${CMAKE_CURRENT_SOURCE_DIR}/sounds"
+		"$<TARGET_FILE_DIR:pomodoro>/sounds"
+)

@@ -1,7 +1,7 @@
 #include "AudioPlayer.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
-
+#include "Paths.h"
 #include <stdexcept>
 #include <format>
 #include <filesystem>
@@ -140,7 +140,7 @@ void AudioPlayer::playAlert() {
 	if (getAlertStatus()) {
 		updateAlertStatus();
 	}
-	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/alerts/clear_bell_chime.mp3");
+	initializeDecoder((Paths::executableDir() / "sounds/alerts/clear_bell_chime.mp3").string());
 	initializePlaybackDevice();
 	ma_device_start(&device);
 	std::unique_lock<std::mutex> lock (mutex);
@@ -153,7 +153,7 @@ void AudioPlayer::playAlert() {
 
 void AudioPlayer::playAmbientNoise() {
 	updateLoopSound();
-	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/brown_noise/smooth_brown_noise.mp3");
+	initializeDecoder((Paths::executableDir() / "sounds/brown_noise/smooth_brown_noise.mp3").string());
 	initializePlaybackDevice();
 	ma_device_start(&device);
 }
