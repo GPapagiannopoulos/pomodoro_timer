@@ -140,7 +140,7 @@ void AudioPlayer::playAlert() {
 	if (getAlertStatus()) {
 		updateAlertStatus();
 	}
-	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/alerts/alert.mp3");
+	initializeDecoder("C:/Users/georg/source/repos/pomodoro_timer/sounds/alerts/clear_bell_chime.mp3");
 	initializePlaybackDevice();
 	ma_device_start(&device);
 	std::unique_lock<std::mutex> lock (mutex);

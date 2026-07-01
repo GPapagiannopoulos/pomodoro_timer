@@ -17,4 +17,5 @@ public:
 	std::tuple<int, int, int> getRemainingTime() const;
 	bool isTimerComplete() const;
 	const std::string getLabel() const;
+	std::chrono::system_clock::time_point getStartTime() const;
 };
