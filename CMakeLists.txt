@@ -34,7 +34,7 @@ add_executable(pomodoro
 	"${imgui_SOURCE_DIR}/imgui_widgets.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
- "AudioPlayer.h" "AudioPlayer.cpp" "sqlite3/sqlite3.h" "sqlite3/sqlite3.c" "SessionRecord.h" "SessionRecord.cpp" "SessionStore.h" "SessionStore.cpp")
+ "AudioPlayer.h" "AudioPlayer.cpp" "sqlite3/sqlite3.h" "sqlite3/sqlite3.c" "SessionRecord.h" "SessionRecord.cpp" "SessionStore.h" "SessionStore.cpp" "Paths.h" "Paths.cpp")
 
 target_include_directories(
 	pomodoro PRIVATE
