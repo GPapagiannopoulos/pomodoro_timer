@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(pomodoro_timer CXX)
+project(pomodoro_timer CXX C)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -34,13 +34,14 @@ add_executable(pomodoro
 	"${imgui_SOURCE_DIR}/imgui_widgets.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
 	"${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
- "AudioPlayer.h" "AudioPlayer.cpp")
+ "AudioPlayer.h" "AudioPlayer.cpp" "sqlite3/sqlite3.h" "sqlite3/sqlite3.c" "SessionRecord.h" "SessionRecord.cpp")
 
 target_include_directories(
 	pomodoro PRIVATE
 	"${imgui_SOURCE_DIR}"
 	"${imgui_SOURCE_DIR}/backends"
 	"${miniaudio_SOURCE_DIR}"
+	"C:/Users/georg/source/repos/pomodoro_timer/sqlite3"
 )
 target_link_libraries(
 	pomodoro PRIVATE
